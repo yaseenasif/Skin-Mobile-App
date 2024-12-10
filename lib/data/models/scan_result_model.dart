@@ -1,31 +1,30 @@
 class ScanResultModel {
   final String id;
-  final String date;
-  final String riskLevel;
-  final String confidence;
+  final String name;
+  final String description;
+  final String treatment;
 
   ScanResultModel({
     required this.id,
-    required this.date,
-    required this.riskLevel,
-    required this.confidence,
+    required this.name,
+    required this.description,
+    required this.treatment,
   });
 
   factory ScanResultModel.fromJson(Map<String, dynamic> json) {
     return ScanResultModel(
       id: json['id'],
-      date: json['date'],
-      riskLevel: json['riskLevel'],
-      confidence: json['confidence'],
+      name: json['name'],
+      description: json['description'],
+      treatment: json['treatment'],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'date': date,
-      'riskLevel': riskLevel,
-      'confidence': confidence,
+      'name': name,
+      'description': description,
     };
   }
 }

@@ -7,6 +7,8 @@ import 'package:skinner/data/providers/scan_provider.dart';
 import 'package:skinner/shared/navigation/navigation_service.dart';
 import 'package:skinner/shared/navigation/navigation_service.dart';
 
+import '../../core/utils/image_util.dart';
+
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
 
@@ -39,14 +41,19 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
 
     setState(() => _isLoading = true);
 
-    final result = ref.read(scanAnalysisProvider(_selectedImage!.path));
+    final result = await ref.read(scanAnalysisProvider(_selectedImage!.path).future);
 
     setState(() => _isLoading = false);
 
-    AppNavigator.pushNamed(
-      '/results',
-      arguments: {'scanResult': result},
-    );
+    if (result != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Predicted Disease: ${result.name}')),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Failed to analyze image')),
+      );
+    }
   }
 
   @override
@@ -70,7 +77,26 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
                 : const Text('No image selected'),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: ,
+              onPressed: () async {
+                final image = await ImagePickerClass.pickImageFromGallery();
+                if (image != null){
+                  setState(() {
+                    _selectedImage = XFile(image.path);
+                  });
+                }
+                },
+              child: const Text('Upload Image'),
+            ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () async {
+                final image = await ImagePickerClass.pickImageFromCamera();
+                if (image != null){
+                  setState(() {
+                    _selectedImage = XFile(image.path);
+                  });
+                }
+              },
               child: const Text('Capture Image'),
             ),
             const SizedBox(height: 20),

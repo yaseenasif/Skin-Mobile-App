@@ -1,5 +1,4 @@
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 
@@ -10,10 +9,10 @@ class ImagePickerClass {
   static Future<File?> pickImageFromGallery() async {
     try {
       // Request permission to access gallery
-      final permissionStatus = await Permission.photos.request();
-      if (!permissionStatus.isGranted) {
-        throw Exception('Gallery permission not granted');
-      }
+      // final permissionStatus = await Permission.photos.request();
+      // if (!permissionStatus.isGranted) {
+      //   throw Exception('Gallery permission not granted');
+      // }
 
       final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
       if (pickedFile != null) {
@@ -31,10 +30,10 @@ class ImagePickerClass {
   static Future<File?> pickImageFromCamera() async {
     try {
       // Request permission to access camera
-      final cameraPermissionStatus = await Permission.camera.request();
-      if (!cameraPermissionStatus.isGranted) {
-        throw Exception('Camera permission not granted');
-      }
+      // final cameraPermissionStatus = await Permission.camera.request();
+      // if (!cameraPermissionStatus.isGranted) {
+      //   throw Exception('Camera permission not granted');
+      // }
 
       final pickedFile = await _picker.pickImage(source: ImageSource.camera);
       if (pickedFile != null) {
