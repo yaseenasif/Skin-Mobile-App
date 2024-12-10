@@ -3,11 +3,15 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:skinner/data/providers/scan_provider.dart';
-import 'package:skinner/shared/navigation/navigation_service.dart';
+import 'package:skinner/core/utils/dialog_util.dart';
+import 'package:skinner/core/utils/toast_utils.dart';
+import 'package:skinner/shared/navigation/app_routes.dart';
 import 'package:skinner/shared/navigation/navigation_service.dart';
 
-import '../../core/utils/image_util.dart';
+import '../../core/utils/bottom_modal_util.dart';
+import '../../data/services/prediction_service.dart';
+import '../../shared/widgets/bottom_modals/image_pick_modal.dart';
+import 'prediction_result_screen.dart';
 
 class ScanScreen extends ConsumerStatefulWidget {
   const ScanScreen({super.key});
@@ -18,41 +22,47 @@ class ScanScreen extends ConsumerStatefulWidget {
 
 class _ScanScreenState extends ConsumerState<ScanScreen> {
   XFile? _selectedImage;
-  bool _isLoading = false;
 
-  // Future<void> _pickImage() async {
-  //   final picker = ImagePicker();
-  //   final image = await picker.pickImage(source: ImageSource.camera);
-  //
-  //   if (image != null) {
-  //     setState(() {
-  //       _selectedImage = image;
-  //     });
-  //   }
-  // }
+  void _showCaptureImageModal() {
+    BottomModalUtil.showBottomModal(
+      context,
+      CaptureImageBottomModal(
+        onImageSelected: (File? image) {
+          if (image != null) {
+            setState(() {
+              _selectedImage = XFile(image.path);
+            });
+          } else {
+            ToastUtil.showError(
+                "Some error occurred while selecting the image.");
+          }
+        },
+      ),
+    );
+  }
 
   Future<void> _analyzeImage() async {
     if (_selectedImage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please capture an image first!')),
-      );
+      ToastUtil.showToast("Please capture or upload an image first!");
       return;
     }
 
-    setState(() => _isLoading = true);
+    DialogUtil.showLoadingDialog();
 
-    final result = await ref.read(scanAnalysisProvider(_selectedImage!.path).future);
+    try {
+      final predictionResult = await ref
+          .read(predictionServiceProvider)
+          .analyzeImage(_selectedImage!.path);
 
-    setState(() => _isLoading = false);
+      DialogUtil.hideLoadingDialog();
 
-    if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Predicted Disease: ${result.name}')),
+      AppNavigator.pushNamed(
+        AppRoutes.result,
+        arguments: predictionResult,
       );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to analyze image')),
-      );
+    } catch (e) {
+      DialogUtil.hideLoadingDialog();
+      ToastUtil.showError("An error occurred while analyzing the image.");
     }
   }
 
@@ -65,47 +75,59 @@ class _ScanScreenState extends ConsumerState<ScanScreen> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _selectedImage != null
-                ? Image.file(
-                    File(_selectedImage!.path),
-                    width: 200,
-                    height: 200,
-                    fit: BoxFit.cover,
-                  )
-                : const Text('No image selected'),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                final image = await ImagePickerClass.pickImageFromGallery();
-                if (image != null){
-                  setState(() {
-                    _selectedImage = XFile(image.path);
-                  });
-                }
-                },
-              child: const Text('Upload Image'),
+            GestureDetector(
+              onTap: _showCaptureImageModal,
+              child: Container(
+                width: double.infinity,
+                height: 250,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey, width: 2),
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.grey[200],
+                ),
+                child: _selectedImage != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.file(
+                          File(_selectedImage!.path),
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: double.infinity,
+                        ),
+                      )
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.camera_alt,
+                              size: 50, color: Colors.grey[600]),
+                          const SizedBox(height: 8),
+                          Text(
+                            "Tap to select an image",
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+              ),
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () async {
-                final image = await ImagePickerClass.pickImageFromCamera();
-                if (image != null){
-                  setState(() {
-                    _selectedImage = XFile(image.path);
-                  });
-                }
-              },
-              child: const Text('Capture Image'),
-            ),
-            const SizedBox(height: 20),
-            _isLoading
-                ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _analyzeImage,
-                    child: const Text('Analyze Image'),
+            const Spacer(), // Push the Analyze button to the bottom
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: _analyzeImage,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
+                ),
+                child: const Text(
+                  'Analyze Image',
+                  style: TextStyle(fontSize: 18),
+                ),
+              ),
+            ),
           ],
         ),
       ),

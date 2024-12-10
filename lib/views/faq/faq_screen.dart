@@ -23,20 +23,44 @@ class FAQScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('FAQs'),
+        centerTitle: true,
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: ListView.builder(
           itemCount: faqs.length,
           itemBuilder: (context, index) {
-            return ExpansionTile(
-              title: Text(faqs[index]['question']!),
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(faqs[index]['answer']!),
+            return Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
+              ),
+              elevation: 4,
+              margin: const EdgeInsets.symmetric(vertical: 8),
+              child: ExpansionTile(
+                title: Text(
+                  faqs[index]['question']!,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
-              ],
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12.0),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[100],
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12.0),
+                        bottomRight: Radius.circular(12.0),
+                      ),
+                    ),
+                    child: Text(
+                      faqs[index]['answer']!,
+                      style: const TextStyle(fontSize: 14),
+                    ),
+                  ),
+                ],
+              ),
             );
           },
         ),

@@ -25,7 +25,7 @@ class CustomCheckboxWithLink extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Checkbox(
           value: value,

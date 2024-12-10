@@ -18,12 +18,15 @@ class WelcomeScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Image.asset(
-                AppIcons.logoIcon,
-              ),
-              const Text(
-                'Welcome to Skin Vision',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              const Column(
+                children: [
+                  FlutterLogo(size: 100),
+                  SizedBox(height: 30),
+                  Text(
+                    'Welcome to Skin Vision',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
               Column(children: [
                 CustomButton(

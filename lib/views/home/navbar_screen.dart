@@ -20,7 +20,6 @@ class _NavbarScreenState extends State<NavbarScreen> {
     const EditProfileScreen(),
     const ScanScreen(),
     FAQScreen(),
-    NotificationScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -54,10 +53,6 @@ class _NavbarScreenState extends State<NavbarScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.help),
             label: 'FAQ',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications),
-            label: 'Notifications',
           ),
         ],
       ),

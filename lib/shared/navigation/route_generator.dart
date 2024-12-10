@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:skinner/data/models/skin_disease.dart';
 import 'package:skinner/views/home/navbar_screen.dart';
 import 'package:skinner/views/splash/splash_screen.dart';
 
@@ -9,7 +10,7 @@ import '../../views/faq/faq_screen.dart';
 import '../../views/home/home_screen.dart';
 import '../../views/notification/notification_screen.dart';
 import '../../views/profile/edit_profile_screen.dart';
-import '../../views/scan/result_screen.dart';
+import '../../views/scan/prediction_result_screen.dart';
 import '../../views/scan/scan_screen.dart';
 
 import 'app_routes.dart';
@@ -34,9 +35,9 @@ class RouteGenerator {
       case AppRoutes.notifications:
         return MaterialPageRoute(builder: (_) => NotificationScreen());
       case AppRoutes.result:
-        final args = settings.arguments as Map<String, dynamic>;
         return MaterialPageRoute(
-          builder: (_) => ResultScreen(scanResult: args['scanResult']),
+          builder: (_) => PredictionResultScreen(
+              predictedDisease: settings.arguments as SkinDisease),
         );
       case AppRoutes.login:
         return MaterialPageRoute(builder: (_) => const LoginScreen());

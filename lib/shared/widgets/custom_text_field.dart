@@ -1,21 +1,30 @@
 import 'package:flutter/material.dart';
-
 import '../../core/constants/app_colors.dart'; // Update the import path for AppColors
 
 class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String labelText;
   final bool isPasswordField;
+  final String? Function(String?)? validator;
+  final TextInputType keyboardType;
+  final Color? fillColor;
+  final TextStyle? hintStyle;
+  final bool autoFocus;
 
   const CustomTextField({
     super.key,
     required this.controller,
     required this.labelText,
     this.isPasswordField = false,
+    this.validator,
+    this.keyboardType = TextInputType.text,
+    this.fillColor,
+    this.hintStyle,
+    this.autoFocus = false,
   });
 
   @override
-  _CustomTextFieldState createState() => _CustomTextFieldState();
+  State<CustomTextField> createState() => _CustomTextFieldState();
 }
 
 class _CustomTextFieldState extends State<CustomTextField> {
@@ -35,27 +44,29 @@ class _CustomTextFieldState extends State<CustomTextField> {
       controller: widget.controller,
       obscureText: _obscureText,
       cursorColor: AppColors.textPrimary,
+      keyboardType: widget.keyboardType,
+      validator: widget.validator,
+      autofocus: widget.autoFocus,
       decoration: InputDecoration(
-        hintText: widget.labelText, // Use hintText instead of labelText
-        hintStyle: TextStyle(color: Colors.grey[600]), // Customize hint style
+        hintText: widget.labelText,
+        hintStyle: widget.hintStyle ?? TextStyle(color: Colors.grey[600]),
         filled: true,
-        fillColor: Colors.grey[200],
-
-        // border: UnderlineInputBorder(
-        //   borderRadius: BorderRadius.circular(8.0),
-        //   borderSide: const BorderSide(color: AppColors.primary),
-        // ),
-        // enabledBorder: UnderlineInputBorder(
-        //   borderRadius: BorderRadius.circular(8.0),
-        //   borderSide: const BorderSide(color: AppColors.primary),
-        // ),
-        focusedBorder: const UnderlineInputBorder(
+        fillColor: widget.fillColor ?? Colors.grey[200],
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8.0),
+          borderSide: const BorderSide(color: AppColors.primary),
+        ),
+        focusedBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: AppColors.primary, width: 2.0),
         ),
-        errorBorder: const UnderlineInputBorder(
+        errorBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.red),
         ),
-        focusedErrorBorder: const UnderlineInputBorder(
+        focusedErrorBorder: const OutlineInputBorder(
           borderSide: BorderSide(color: Colors.red, width: 2.0),
         ),
         suffixIcon: widget.isPasswordField
